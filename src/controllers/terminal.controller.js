@@ -1,11 +1,18 @@
 const { request, response } = require("express");
 
-const { TerminalsModel, SurveyTerminalsModel, SurveysModel, AreaHeadquartersModel, HeadQuartersModel, AreasModel } = require("../models");
+const {
+  TerminalsModel,
+  SurveyTerminalsModel,
+  SurveysModel,
+  AreaHeadquartersModel,
+  HeadQuartersModel,
+  AreasModel,
+} = require("../models");
 const getAllTerminals = async (req = request, res = response) => {
   try {
     await TerminalsModel.findAll({
       where: { trm_state: 1 },
-      attributes: { exclude: ["createdAt", "updatedAt", "trm_state"] },
+      attributes: { exclude: ["createdAt", "updatedAt"] },
     }).then((result) => res.status(200).json(result));
   } catch (error) {
     console.log(error);
@@ -48,12 +55,10 @@ const getAllSurveyTerminals = async (req = request, res = response) => {
         },
       ],
       attributes: { exclude: ["createdAt", "updatedAt"] },
-    }).then((result) =>{
+    }).then((result) => {
       let rep = groupBy(result, "id_terminal");
-      res.status(200).json(rep)
-    }
-      
-    );
+      res.status(200).json(rep);
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -63,16 +68,15 @@ const getAllSurveyTerminals = async (req = request, res = response) => {
 };
 const registerTerminal = async (req = request, res = response) => {
   try {
-    const { id_administrator, trm_description, trm_serie } = req.body;
+    const { id_administrator, trm_serie } = req.body;
 
     const terminal = new TerminalsModel();
     terminal.id_administrator = id_administrator;
-    terminal.trm_description = trm_description;
     terminal.trm_serie = trm_serie;
     await terminal.save();
     return res.json({
       terminal,
-      msg: "tipo de usuario registrado satisfactoriamente",
+      msg: "terminal registrado satisfactoriamente",
     });
   } catch (error) {
     console.log(error);
@@ -98,9 +102,48 @@ const registerSurveyTerminal = async (req = request, res = response) => {
     });
   }
 };
+
+const updateTerminal = async (req = request, res = response) => {
+  try {
+    const { trm_serie, trm_state } = req.body;
+    if (req.body.trm_serie) {
+      let terminalExist = await TerminalsModel.findOne({
+        where: { trm_serie: trm_serie },
+      });
+      if (terminalExist) {
+        if (terminalExist.id != req.params.Id) {
+          return res
+            .status(400)
+            .json({
+              errors: [{ msg: "ya existe un registro con esa serie" }],
+            });
+        }
+      }
+    }
+
+    TerminalsModel.update(
+      {
+        trm_serie: trm_serie,
+        trm_state: trm_state,
+      },
+      { where: { id: req.params.Id } }
+    ).then(async () => {
+      let terminal = await TerminalsModel.findOne({
+        where: { id: req.params.Id },
+      });
+      res.status(200).json({ terminal, msg: "Editado correctamente" });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      msg: error,
+    });
+  }
+};
 module.exports = {
   getAllTerminals,
   registerTerminal,
   registerSurveyTerminal,
   getAllSurveyTerminals,
+  updateTerminal,
 };

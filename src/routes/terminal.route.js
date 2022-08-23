@@ -8,7 +8,8 @@ const {
     getAllTerminals,
     registerTerminal,
     registerSurveyTerminal,
-    getAllSurveyTerminals
+    getAllSurveyTerminals,
+    updateTerminal
 } = require("../controllers/terminal.controller");
 const router = Router();
 
@@ -19,7 +20,7 @@ router.get('/survey', validarJWT , getAllSurveyTerminals)
 
 router.post('/register',[
     check('id_administrator','El id_administrator es obligatorio').not().isEmpty(),
-    check('trm_description','El trm_description es obligatorio').not().isEmpty(),
+    check('trm_serie','El trm_description es obligatorio').not().isEmpty(),
     validarCampos
 ], validarJWT , registerTerminal);
 
@@ -29,5 +30,5 @@ router.post('/register/survey/terminal',[
     validarCampos
 ], validarJWT, registerSurveyTerminal)
 
-
+router.put('/update/:Id', validarJWT, updateTerminal)
 module.exports = router;
