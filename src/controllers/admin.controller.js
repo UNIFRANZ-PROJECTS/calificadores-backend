@@ -12,12 +12,11 @@ const {
   getAllRolPermisions,
   createAdministator,
   createAdminAreaCampus,
-  getAllAreasCampus,
-  getAllAreasFunction,
   getAllCampus,
 } = require("../functions/admin.function");
 const {
   AdministratorsModel,
+  PermisionRolesModel,
   forgotPasswords,
   AdminAreaCampusModel,
   AreaHeadquartersModel,
@@ -30,22 +29,37 @@ const adminAuth = async (req = Request, res = Response) => {
   const { email, password } = req.body;
   try {
     if (email && password) {
-      let user = await getAdministrator({ adm_email: email, adm_state: 1 });
+      let user = await AdministratorsModel.findOne({
+        where: { adm_email: email, adm_state: 1 },
+        include: [
+          {
+            model: TypeUsersModel,
+            required: true,
+          },
+          {
+            model: RolesModel,
+            required: true,
+          },
+        ],
+      });
       if (!user) {
         return res.status(404).json({ message: "Usuario no tiene acceso" });
       }
-      bcryptjs.compare(password, user.adm_password, async function (err, result) {
-        if (result) {
-          let token = await gerateJWT(user.id);
-          let areaCampus = [];
-          let areaCampusName = [];
-          await getAllAdminAreaCampus(email == "servest@unifranz.edu.bo" ? null : { id_admin: user.id }
-          ).then(async (result2) => {
-
-
+      bcryptjs.compare(
+        password,
+        user.adm_password,
+        async function (err, result) {
+          if (result) {
+            let token = await gerateJWT(user.id);
+            let areaCampus = [];
+            let areaCampusName = [];
+            await getAllAdminAreaCampus(
+              email == "servest@unifranz.edu.bo" ? null : { id_admin: user.id }
+            ).then(async (result2) => {
               await result2.forEach((element) => {
                 if (
-                  areaCampus.filter((e) => e == element.id_area_campus).length == 0
+                  areaCampus.filter((e) => e == element.id_area_campus)
+                    .length == 0
                 ) {
                   // console.log(element.serv_area)
                   areaCampus.push(element.id_area_campus);
@@ -56,29 +70,27 @@ const adminAuth = async (req = Request, res = Response) => {
                   );
                 }
               });
-              if (email == "servest@unifranz.edu.bo" ) {
-                areaCampus=[1,2,3,4];
+              if (email == "servest@unifranz.edu.bo") {
+                areaCampus = [1, 2, 3, 4];
               }
-            let rol = await getAllRolPermisions({
-              id_rol: user.id_rol,
-              prmRls_state: 1,
+              let rol = await  PermisionRolesModel.findAll({
+                where: { id_rol: user.id_rol, prmRls_state: 1 },
+              })
+              let permisions = rol.map(a => a.id_permision);
+              return res.json({
+                msg: "ok user",
+                user: user,
+                token: token,
+                permisions,
+                area_campus: areaCampus,
+                area_campus_name: areaCampusName,
+              });
             });
-            return res.json({
-              msg: "ok user",
-              adm_name: user.adm_name,
-              id: user.id,
-              type_user: user.serv_type_user.tyUsr_name,
-              token: token,
-              id_rol: user.id_rol,
-              rol,
-              area_campus: areaCampus,
-              area_campus_name: areaCampusName,
-            });
-          });
-        } else {
-          return res.status(404).json({ message: "Contraseña incorrecta" });
+          } else {
+            return res.status(404).json({ message: "Contraseña incorrecta" });
+          }
         }
-      });
+      );
     }
   } catch (error) {
     console.log(error);
@@ -358,7 +370,7 @@ const getAdministratorsByAreaCampus = async (req = Request, res = Response) => {
 };
 const updatePwd = async (req = Request, res = Response) => {
   try {
-    const {password} = req.body;
+    const { password } = req.body;
     //encriptar nueva contraseña
     const salt = bcryptjs.genSaltSync();
     const newPassword = await bcryptjs.hashSync(password, salt);

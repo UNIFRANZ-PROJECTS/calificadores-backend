@@ -19,8 +19,8 @@ const {
 const router = Router();
 
 router.post('/auth',[
-    check('password' , 'La contrasena debe de ser más de 6 letras').isLength({ min: 5 }),
     check('email' , 'El correo no es válido').isEmail(),
+    check('password' , 'La contrasena debe de ser más de 6 letras').isLength({ min: 6 }),
     validarCampos
 ],adminAuth)
 
