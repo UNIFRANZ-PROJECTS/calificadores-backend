@@ -25,6 +25,10 @@ const {
   TypeUsersModel,
   RolesModel,
 } = require("../models");
+
+function getUniqueListBy(arr, key) {
+  return [...new Map(arr.map(item => [item[key], item])).values()]
+}
 const adminAuth = async (req = Request, res = Response) => {
   const { email, password } = req.body;
   try {
@@ -43,7 +47,7 @@ const adminAuth = async (req = Request, res = Response) => {
         ],
       });
       if (!user) {
-        return res.status(404).json({ message: "Usuario no tiene acceso" });
+        return res.status(404).json({ msg: "Usuario no tiene acceso" });
       }
       bcryptjs.compare(
         password,
@@ -51,43 +55,32 @@ const adminAuth = async (req = Request, res = Response) => {
         async function (err, result) {
           if (result) {
             let token = await gerateJWT(user.id);
-            let areaCampus = [];
-            let areaCampusName = [];
-            await getAllAdminAreaCampus(
-              email == "servest@unifranz.edu.bo" ? null : { id_admin: user.id }
-            ).then(async (result2) => {
-              await result2.forEach((element) => {
-                if (
-                  areaCampus.filter((e) => e == element.id_area_campus)
-                    .length == 0
-                ) {
-                  // console.log(element.serv_area)
-                  areaCampus.push(element.id_area_campus);
-                  areaCampusName.push(
-                    element.serv_area_headquarter.serv_area.ars_name +
-                      "-" +
-                      element.serv_area_headquarter.serv_headquarter.hdq_name
-                  );
-                }
-              });
-              if (email == "servest@unifranz.edu.bo") {
-                areaCampus = [1, 2, 3, 4];
-              }
-              let rol = await  PermisionRolesModel.findAll({
-                where: { id_rol: user.id_rol, prmRls_state: 1 },
-              })
-              let permisions = rol.map(a => a.id_permision);
-              return res.json({
-                msg: "ok user",
-                user: user,
-                token: token,
-                permisions,
-                area_campus: areaCampus,
-                area_campus_name: areaCampusName,
-              });
+            let resp = await getAllAdminAreaCampus({ id_admin: user.id })
+            let areaCampus = resp.map((a) => a.serv_area_headquarter.id_campus);
+            areaCampus = [...new Set(areaCampus)];
+            let areaCampusName = resp.map((a) => a.serv_area_headquarter.serv_area.ars_name+'-'+a.serv_area_headquarter.serv_headquarter.hdq_name);
+            // areaCampusName = await getUniqueListBy(areaCampusName);
+            let rol = await PermisionRolesModel.findAll({
+              where: { id_rol: user.id_rol, prmRls_state: 1 },
+            });
+
+            let campus = resp.map((a) => a.serv_area_headquarter.serv_headquarter);
+            campus = await getUniqueListBy(campus,'id');
+            let permisions = rol.map((a) => a.id_permision);
+            if (email == "servest@unifranz.edu.bo") {
+              areaCampus = [1, 2, 3, 4];
+            }
+            return res.json({
+              msg: "ok user",
+              user: user,
+              token: token,
+              permisions,
+              area_campus: areaCampus,
+              area_campus_name: areaCampusName,
+              campus:campus
             });
           } else {
-            return res.status(404).json({ message: "Contraseña incorrecta" });
+            return res.status(404).json({ msg: "Contraseña incorrecta" });
           }
         }
       );

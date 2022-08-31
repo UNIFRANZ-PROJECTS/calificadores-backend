@@ -54,7 +54,6 @@ const getSurveyQuestions = async (req = request, res = response) => {
             serv_headquarter: areaCampus.serv_headquarter.hdq_name,
             id_area_campus: areaCampus.id,
             srv_name: result[i].srv_name,
-            srv_description: result[i].srv_description,
             srv_state: result[i].srv_state,
             questions: questions,
           });
@@ -157,7 +156,6 @@ const getSurveyQuestionsById = async (req = request, res = response) => {
                     id_campus:areaCampus.serv_headquarter.id,
                     serv_headquarter:areaCampus.serv_headquarter.hdq_name,
                     srv_name:result.srv_name,
-                    srv_description:result.srv_description,
                     srv_state:result.srv_state,
                     questions:questions})
             })
@@ -177,7 +175,6 @@ const registerSurvey = async (req = request, res = response) => {
       id_administrator,
       id_area_campus,
       srv_name,
-      srv_description,
       questions,
     } = req.body;
     let count = 0;
@@ -187,7 +184,6 @@ const registerSurvey = async (req = request, res = response) => {
     survey.id_administrator = id_administrator;
     survey.id_area_campus = id_area_campus;
     survey.srv_name = srv_name;
-    survey.srv_description = srv_description;
     await survey
       .save()
 
@@ -238,7 +234,6 @@ const registerSurvey = async (req = request, res = response) => {
                 serv_headquarter: areaCampus.serv_headquarter.hdq_name,
                 id_area_campus: areaCampus.id,
                 srv_name: result.srv_name,
-                srv_description: result.srv_description,
                 srv_state: result.srv_state,
                 questions: questionss,
               };
@@ -256,7 +251,7 @@ const registerSurvey = async (req = request, res = response) => {
 };
 const updateSurvey = async (req = request, res = response) => {
   try {
-    const { id_area_campus, srv_name, srv_description, srv_state, questions } =
+    const { id_area_campus, srv_name, srv_state, questions } =
       req.body;
     let surveys = {};
     let questionss = [];
@@ -264,7 +259,6 @@ const updateSurvey = async (req = request, res = response) => {
       {
         id_area_campus: id_area_campus,
         srv_name: srv_name,
-        srv_description: srv_description,
         srv_state: srv_state,
       },
       { where: { id: req.params.Id } }
@@ -370,7 +364,6 @@ const updateSurvey = async (req = request, res = response) => {
         serv_headquarter: areaCampus.serv_headquarter.hdq_name,
         id_area_campus: areaCampus.id,
         srv_name: survey.srv_name,
-        srv_description: survey.srv_description,
         srv_state: survey.srv_state,
         questions: questionss,
       };

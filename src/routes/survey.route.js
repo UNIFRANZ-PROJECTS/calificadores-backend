@@ -25,7 +25,6 @@ router.post('/register',[
     check('id_administrator','El id_administrator es obligatorio').not().isEmpty(),
     check('id_area_campus','El id_area_campus es obligatorio').not().isEmpty(),
     check('srv_name','El srv_name es obligatorio').not().isEmpty(),
-    check('srv_description','El srv_description es obligatorio').not().isEmpty(),
     check('questions','El questions es obligatorio').not().isEmpty(),
     validarCampos
 ], validarJWT, registerSurvey);

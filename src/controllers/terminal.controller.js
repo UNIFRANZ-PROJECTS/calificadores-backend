@@ -88,6 +88,11 @@ const registerTerminal = async (req = request, res = response) => {
 const registerSurveyTerminal = async (req = request, res = response) => {
   try {
     const { id_survey, id_terminal } = req.body;
+    let terminal = await TerminalsModel.findAll({
+      where: { trm_serie:id_terminal,trm_state: 1 },
+    });
+    if(terminal.length === 0 )return res.status(400).json({ msg: "La terminal no está registrado" })
+
     const SurveyTerminals = new SurveyTerminalsModel();
     SurveyTerminals.id_survey = id_survey;
     SurveyTerminals.id_terminal = id_terminal;

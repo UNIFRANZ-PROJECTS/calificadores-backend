@@ -20,6 +20,6 @@ router.post('/register',[
     check('answer','El answer es obligatorio').not().isEmpty(),
     check('date_answer','El date_answer es obligatorio').not().isEmpty(),
     validarCampos
-], validarJWT, registerAnswer);
+], registerAnswer);
 
 module.exports = router;

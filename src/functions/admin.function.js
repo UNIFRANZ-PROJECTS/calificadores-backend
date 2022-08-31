@@ -124,7 +124,7 @@ const getAllAdminAreaCampus = async obj => {
                 model: SurveysModel,
                 where: obj1,
                 required: true,
-                attributes: {exclude: ['id','id_administrator','id_area_campus','srv_description','srv_state','createdAt','updatedAt']},
+                attributes: {exclude: ['id','id_administrator','id_area_campus','srv_state','createdAt','updatedAt']},
                 include: [
                     {
                         model: AreaHeadquartersModel,
