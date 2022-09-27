@@ -9,7 +9,8 @@ const {
     getAreasByIdCampus,
     getAreaCampusById,
     registerAreaCampus,
-    updateAreaCampusById
+    updateAreaCampusById,
+    getSurveysByCampusId
 } = require("../controllers/area.controller");
 const router = Router();
 
@@ -28,4 +29,6 @@ router.post('/register/areacampus',[
 
 router.put('/update/areacampus/:Id', validarJWT, updateAreaCampusById)
 
+
+router.get('/surveys/campus/:Id',validarJWT,getSurveysByCampusId)
 module.exports = router;

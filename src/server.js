@@ -22,6 +22,8 @@ class Server {
     this.typeAnswers = '/api/typeanswer';
     this.areas = '/api/areas';
     this.campus = '/api/campus';
+    //registro
+    this.register = '/register/answer'
 
     //conectar a DB
     this.contectDB();
@@ -64,7 +66,7 @@ class Server {
     this.app.use(this.typeAnswers,require('./routes/typeAnswer.route'));//test
     this.app.use(this.areas,require('./routes/area.route'))//test
     this.app.use(this.campus,require('./routes/campus.route'))
-    
+    this.app.use(this.register,require('./routes/register.route'))
   }
 
 

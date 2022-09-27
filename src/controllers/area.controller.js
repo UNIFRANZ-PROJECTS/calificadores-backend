@@ -3,7 +3,7 @@ const { request, response } = require("express");
 
 
 
-const { AreasModel,AreaHeadquartersModel,HeadQuartersModel,AdminAreaCampusModel } = require("../models");
+const { AreasModel,AreaHeadquartersModel,HeadQuartersModel,AdminAreaCampusModel,SurveysModel, SurveysQuestionsModel, QuestionsModel } = require("../models");
 const getAllAreas = async( req = Request , res = Response ) => {
   try {
     AreasModel.findAll({
@@ -79,6 +79,47 @@ const getAreasByIdCampus = async( req = Request , res = Response ) => {
       });
     }
   }
+const getSurveysByCampusId = async( req = request , res = response ) => {
+//devolver todas las areas con sus respectivas encuestas
+try {
+  let areaHeadquarter = await AreaHeadquartersModel.findAll({
+    where: {id_campus:req.params.Id},
+    attributes: { exclude: ["id_campus","id_area","createdAt", "updatedAt"] },
+    include: [
+      {
+        model: AreasModel,
+        required: true,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+    ],
+  })
+  for await (const results of areaHeadquarter) {
+    let survey = await SurveysModel.findAll({
+      where: {id_area_campus:results.id},
+    })
+    for await ( const result2 of survey){
+      let question = await SurveysQuestionsModel.findAll({
+        where: { id_survey:result2.id },
+        include: [
+          {
+            model: QuestionsModel,
+            required: true,
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
+      })
+      result2.dataValues.questions = question;
+    }
+    results.dataValues.survey = survey 
+  }
+  res.status(200).json(areaHeadquarter)
+} catch (error) {
+  console.log(error);
+  res.status(500).json({
+    msg: "Hable con el administrador",
+  });
+}
+}
 const registerAreaCampus = async( req = request , res = response ) => {
     try {
         const { id_administrator,ars_name,id_campus} = req.body;
@@ -185,4 +226,5 @@ module.exports = {
     getAreasByIdCampus,
     getAllAreas,
     getAreaCampusById,
+    getSurveysByCampusId
 };
