@@ -23,9 +23,11 @@ const getAllRolPermisionsFunction = async (obj) => {
     where: obj,
     include: [
       {
-          model: PermisionsModel,
-          required: true,
-          attributes: {exclude: ['prm_description','createdAt','updatedAt','prm_state']},
+        model: PermisionsModel,
+        required: true,
+        attributes: {
+          exclude: ["prm_description", "createdAt", "updatedAt", "prm_state"],
+        },
       },
     ],
     // attributes: []
@@ -36,10 +38,13 @@ const getAllRolPermisions = async (req = request, res = response) => {
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
   for (let i = 0; i < rol.length; i++) {
-    let permision = await getAllRolPermisionsFunction({id_rol:rol[i].id,prmRls_state:1})
+    let permision = await getAllRolPermisionsFunction({
+      id_rol: rol[i].id,
+      prmRls_state: 1,
+    });
     rol[i].dataValues.permision = permision;
   }
-  return res.json(rol)
+  return res.json(rol);
 };
 const registerRol = async (req = request, res = response) => {
   let rolPermisions = {
@@ -103,7 +108,7 @@ const registerRol = async (req = request, res = response) => {
 };
 const updateRol = async (req = request, res = response) => {
   try {
-    const { rls_name, rls_description,rls_state,rls_permisions} = req.body;
+    const { rls_name, rls_description, rls_state, rls_permisions } = req.body;
     RolesModel.update(
       {
         rls_name: rls_name,
@@ -118,7 +123,7 @@ const updateRol = async (req = request, res = response) => {
           {
             model: PermisionsModel,
             required: true,
-            where:{ prm_state: 1},
+            where: { prm_state: 1 },
             attributes: {
               exclude: [
                 "prm_description",
@@ -131,40 +136,44 @@ const updateRol = async (req = request, res = response) => {
         ],
       });
       let edit = [];
-      for (let i = 0; i < rls_permisions.length; i++) {
-        for (let j = 0; j < permisionRol.length; j++) {
-          if (rls_permisions[i] == permisionRol[j].id_permision) {
-            await PermisionRolesModel.update(
-              {
-                prmRls_state: 1,
-              },
-              {
-                where: { id: permisionRol[j].id },
-              }
-            );
-            edit.push(permisionRol[j].id_permision);
-          } else {
-            if (
-              edit.filter((e) => e == permisionRol[j].id_permision).length == 0
-            ) {
+      if (rls_permisions != undefined) {
+        for (let i = 0; i < rls_permisions.length; i++) {
+          for (let j = 0; j < permisionRol.length; j++) {
+            if (rls_permisions[i] == permisionRol[j].id_permision) {
               await PermisionRolesModel.update(
                 {
-                  prmRls_state: 0,
+                  prmRls_state: 1,
                 },
                 {
                   where: { id: permisionRol[j].id },
                 }
               );
+              edit.push(permisionRol[j].id_permision);
+            } else {
+              if (
+                edit.filter((e) => e == permisionRol[j].id_permision).length ==
+                0
+              ) {
+                await PermisionRolesModel.update(
+                  {
+                    prmRls_state: 0,
+                  },
+                  {
+                    where: { id: permisionRol[j].id },
+                  }
+                );
+              }
             }
           }
-        }
-        if (
-          permisionRol.filter((e) => e.id_permision == rls_permisions[i]).length == 0
-        ) {
-          const permisionRol = new PermisionRolesModel();
-          permisionRol.id_rol = req.params.Id;
-          permisionRol.id_permision = rls_permisions[i];
-          await permisionRol.save();
+          if (
+            permisionRol.filter((e) => e.id_permision == rls_permisions[i])
+              .length == 0
+          ) {
+            const permisionRol = new PermisionRolesModel();
+            permisionRol.id_rol = req.params.Id;
+            permisionRol.id_permision = rls_permisions[i];
+            await permisionRol.save();
+          }
         }
       }
 

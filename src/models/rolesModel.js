@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require("../conection.js");
+const sequelize = require("../database/connection.js");
 const RolesModel = sequelize.define('serv_roles', {
     rls_name: {
       type: Sequelize.STRING,

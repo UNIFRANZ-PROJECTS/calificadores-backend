@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require("../conection.js");
+const sequelize = require("../database/connection.js");
 const AreasModel = sequelize.define('serv_areas', {
     ars_name: {
       type: Sequelize.STRING,

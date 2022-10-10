@@ -27,7 +27,7 @@ const {
 } = require("../models");
 
 function getUniqueListBy(arr, key) {
-  return [...new Map(arr.map(item => [item[key], item])).values()]
+  return [...new Map(arr.map((item) => [item[key], item])).values()];
 }
 const adminAuth = async (req = Request, res = Response) => {
   const { email, password } = req.body;
@@ -55,17 +55,24 @@ const adminAuth = async (req = Request, res = Response) => {
         async function (err, result) {
           if (result) {
             let token = await gerateJWT(user.id);
-            let resp = await getAllAdminAreaCampus({ id_admin: user.id })
+            let resp = await getAllAdminAreaCampus({ id_admin: user.id });
             let areaCampus = resp.map((a) => a.serv_area_headquarter.id_campus);
             areaCampus = [...new Set(areaCampus)];
-            let areaCampusName = resp.map((a) => a.serv_area_headquarter.serv_area.ars_name+'-'+a.serv_area_headquarter.serv_headquarter.hdq_name);
+            let areaCampusName = resp.map(
+              (a) =>
+                a.serv_area_headquarter.serv_area.ars_name +
+                "-" +
+                a.serv_area_headquarter.serv_headquarter.hdq_name
+            );
             // areaCampusName = await getUniqueListBy(areaCampusName);
             let rol = await PermisionRolesModel.findAll({
               where: { id_rol: user.id_rol, prmRls_state: 1 },
             });
 
-            let campus = resp.map((a) => a.serv_area_headquarter.serv_headquarter);
-            campus = await getUniqueListBy(campus,'id');
+            let campus = resp.map(
+              (a) => a.serv_area_headquarter.serv_headquarter
+            );
+            campus = await getUniqueListBy(campus, "id");
             let permisions = rol.map((a) => a.id_permision);
             if (email == "servest@unifranz.edu.bo") {
               areaCampus = [1, 2, 3, 4];
@@ -77,7 +84,7 @@ const adminAuth = async (req = Request, res = Response) => {
               permisions,
               area_campus: areaCampus,
               area_campus_name: areaCampusName,
-              campus:campus
+              campus: campus,
             });
           } else {
             return res.status(404).json({ msg: "Contraseña incorrecta" });
@@ -299,11 +306,10 @@ const getCampusById = async (req = Request, res = Response) => {
 
 const getAdministratorsByAreaCampus = async (req = Request, res = Response) => {
   try {
-    let areaCampus = req.params.Id.split(",");
     let users = [];
     let count = 0;
     await AdminAreaCampusModel.findAll({
-      where: { id_area_campus: areaCampus, state: 1 },
+      where: { state: 1 },
       attributes: { exclude: ["createdAt", "updatedAt"] },
       include: [
         {
@@ -349,7 +355,6 @@ const getAdministratorsByAreaCampus = async (req = Request, res = Response) => {
           count++;
         });
       }
-      console.log(count);
       if (count == result.length) {
         res.json(users);
       }
@@ -413,43 +418,46 @@ const updateAdministrator = async (req = Request, res = Response) => {
         id_admin: req.params.Id,
       });
       let edit = [];
-      for (let i = 0; i < id_area_campus.length; i++) {
-        for (let j = 0; j < areaCampusByAdmin.length; j++) {
-          if (id_area_campus[i] == areaCampusByAdmin[j].id_area_campus) {
-            await AdminAreaCampusModel.update(
-              {
-                state: 1,
-              },
-              {
-                where: { id: areaCampusByAdmin[j].id },
-              }
-            );
-            edit.push(areaCampusByAdmin[j].id_area_campus);
-          } else {
-            if (
-              edit.filter((e) => e == areaCampusByAdmin[j].id_area_campus)
-                .length == 0
-            ) {
+      if (id_area_campus != undefined) {
+        for (let i = 0; i < id_area_campus.length; i++) {
+          for (let j = 0; j < areaCampusByAdmin.length; j++) {
+            if (id_area_campus[i] == areaCampusByAdmin[j].id_area_campus) {
               await AdminAreaCampusModel.update(
                 {
-                  state: 0,
+                  state: 1,
                 },
                 {
                   where: { id: areaCampusByAdmin[j].id },
                 }
               );
+              edit.push(areaCampusByAdmin[j].id_area_campus);
+            } else {
+              if (
+                edit.filter((e) => e == areaCampusByAdmin[j].id_area_campus)
+                  .length == 0
+              ) {
+                await AdminAreaCampusModel.update(
+                  {
+                    state: 0,
+                  },
+                  {
+                    where: { id: areaCampusByAdmin[j].id },
+                  }
+                );
+              }
             }
           }
-        }
-        if (
-          areaCampusByAdmin.filter((e) => e.id_area_campus == id_area_campus[i])
-            .length == 0
-        ) {
-          await createAdminAreaCampus({
-            id_admin: req.params.Id,
-            id_area_campus: id_area_campus[i],
-            prmRls_state: 1,
-          });
+          if (
+            areaCampusByAdmin.filter(
+              (e) => e.id_area_campus == id_area_campus[i]
+            ).length == 0
+          ) {
+            await createAdminAreaCampus({
+              id_admin: req.params.Id,
+              id_area_campus: id_area_campus[i],
+              prmRls_state: 1,
+            });
+          }
         }
       }
       await getAdministrator({ id: req.params.Id }).then(async (result2) => {

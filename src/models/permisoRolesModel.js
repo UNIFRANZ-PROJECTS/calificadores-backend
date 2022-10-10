@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require("../conection.js");
+const sequelize = require("../database/connection.js");
 const PermisionRolesModel = sequelize.define('serv_permision_roles', {
     id_rol: {
       type: Sequelize.INTEGER,

@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require("../conection.js");
+const sequelize = require("../database/connection.js");
 const PermisionsModel = sequelize.define('serv_permisions', {
     prm_name: {
       type: Sequelize.STRING,

@@ -18,6 +18,9 @@ const TypeAnswersModel = require("./tipoRespuestasModel");
 const TypeUsersModel = require("./tipoUsuariosModel");
 const forgotPasswords = require("./recuperarContraseñaModel")
 
+// SurveysModel.belongsTo(AreaHeadquartersModel, {foreignKey: 'id_area_campus'});
+
+
 SurveyTerminalsModel.belongsTo(SurveysModel, {foreignKey: 'id_survey'});
 SurveyTerminalsModel.belongsTo(TerminalsModel, {foreignKey: 'id_terminal'});
 //fk reports

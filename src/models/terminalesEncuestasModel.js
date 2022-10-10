@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require("../conection.js");
+const sequelize = require("../database/connection.js");
 const SurveyTerminalsModel = sequelize.define('serv_terminal_surveys', {
     id_survey: {
       type: Sequelize.INTEGER,

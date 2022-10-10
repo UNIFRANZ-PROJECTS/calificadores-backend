@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require("../conection.js");
+const sequelize = require("../database/connection.js");
 const TypeUsersModel = sequelize.define('serv_type_users', {
     tyUsr_name: {
         type: Sequelize.STRING,

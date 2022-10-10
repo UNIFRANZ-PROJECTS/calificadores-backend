@@ -14,7 +14,7 @@ const getSurveyQuestions = async (req = request, res = response) => {
   let questions = [];
   try {
     await SurveysModel.findAll({
-      where: { srv_state: 1 },
+      // where: { srv_state: 1 },
       include: [
         {
           model: AreaHeadquartersModel,
@@ -278,6 +278,7 @@ const updateSurvey = async (req = request, res = response) => {
         ],
       });
       let edit = [];
+      if (questions != undefined) {
       for (let i = 0; i < questions.length; i++) {
         for (let j = 0; j < surveyQuestions.length; j++) {
           if (questions[i] == surveyQuestions[j].id_question) {
@@ -315,7 +316,8 @@ const updateSurvey = async (req = request, res = response) => {
           SurveysQuestions.id_question = questions[i];
           SurveysQuestions.save();
         }
-      }
+      }}
+      
       let survey = await SurveysModel.findOne({
         where: { id: req.params.Id },
         include: [
@@ -338,6 +340,7 @@ const updateSurvey = async (req = request, res = response) => {
           },
         ],
       });
+     
       for (let j = 0; j < surveyQuestion.length; j++) {
         resp = await QuestionsModel.findOne({
           where: { id: surveyQuestion[j].id_question },

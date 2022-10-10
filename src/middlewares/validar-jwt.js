@@ -20,7 +20,6 @@ const validarJWT = async( req = request, res = response, next ) => {
         const { uid } = jwt.verify( bearerToken, process.env.SECRETORPRIVATEKEY );
 
         // leer el usuario que corresponde al uid
-        console.log(uid)
         const usuario = await AdministratorsModel.findOne({
             where: { id: uid }})
 

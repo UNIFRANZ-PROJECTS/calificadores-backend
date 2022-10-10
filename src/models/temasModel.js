@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require("../conection.js");
+const sequelize = require("../database/connection.js");
 const ThemesModel = sequelize.define('serv_themes', {
     thm_name: {
       type: Sequelize.STRING,

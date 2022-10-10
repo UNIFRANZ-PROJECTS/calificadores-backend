@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require("../conection.js");
+const sequelize = require("../database/connection.js");
 const TerminalsModel = sequelize.define('serv_terminals', {
     id_administrator: {
       type: Sequelize.INTEGER,

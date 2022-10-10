@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 
-const dbConnectionSql = require('./conection');
+const dbConnectionSql = require('./database/connection.js');
 
 
 class Server {
