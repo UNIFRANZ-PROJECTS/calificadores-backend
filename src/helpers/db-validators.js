@@ -88,18 +88,6 @@ const assignmentAreaCampusExist = async (inf = "", data = "") => {
     );
   }
 };
-const surveyExists = async (srv_name = "", data = "") => {
-  // Verificar el area si existe
-  const existSurvey = await SurveysModel.findOne({
-    where: {
-      srv_name: srv_name ?? null,
-      id: { [Op.not]: data.req.params.Id ?? null },
-    },
-  });
-  if (existSurvey) {
-    throw new Error(`El nombre: ${srv_name}, ya está registrado`);
-  }
-};
 const questionExists = async (qst_question = "") => {
   const existQuestion = await QuestionsModel.findOne({
     where: {
@@ -118,6 +106,5 @@ module.exports = {
   typeUserExists,
   areaExists,
   assignmentAreaCampusExist,
-  surveyExists,
   questionExists,
 };

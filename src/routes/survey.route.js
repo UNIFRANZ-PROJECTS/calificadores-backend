@@ -3,7 +3,6 @@ const { check } = require("express-validator");
 
 const { validarCampos, validarJWT } = require("../middlewares");
 
-const { surveyExists } = require("../helpers/db-validators");
 
 const {
   getSurveyAreaCampusById,
@@ -20,6 +19,8 @@ router.get("/areacampus/:Id", validarJWT, getSurveyAreaCampusById);
 
 router.get("/questions/:Id", validarJWT, getSurveyQuestionsById);
 
+// router.get("/",)
+
 router.post(
   "/register",
   [
@@ -29,7 +30,6 @@ router.post(
     check("id_area_campus", "El id_area_campus es obligatorio").not().isEmpty(),
     check("srv_name", "El srv_name es obligatorio").not().isEmpty(),
     check("questions", "El questions es obligatorio").not().isEmpty(),
-    check("srv_name").custom(surveyExists),
     validarCampos,
   ],
   validarJWT,
@@ -38,7 +38,6 @@ router.post(
 
 router.put(
   "/update/:Id",
-  [check("srv_name").custom(surveyExists), validarCampos],
   validarJWT,
   updateSurvey
 );

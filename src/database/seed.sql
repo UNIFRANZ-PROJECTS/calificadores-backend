@@ -1,3 +1,27 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE serv_admin_area_headquarters;
+TRUNCATE TABLE serv_administrators;
+TRUNCATE TABLE serv_answers;
+TRUNCATE TABLE serv_area_headquarters;
+TRUNCATE TABLE serv_areas;
+TRUNCATE TABLE serv_forgot_passwords;
+TRUNCATE TABLE serv_headquarters;
+TRUNCATE TABLE serv_permision_roles;
+TRUNCATE TABLE serv_permisions;
+TRUNCATE TABLE serv_questions;
+TRUNCATE TABLE serv_roles;
+TRUNCATE TABLE serv_surveys;
+TRUNCATE TABLE serv_survey_questions;
+TRUNCATE TABLE serv_terminals;
+TRUNCATE TABLE serv_terminal_surveys;
+TRUNCATE TABLE serv_theme_area_headquarters;
+TRUNCATE TABLE serv_themes;
+TRUNCATE TABLE serv_type_users;
+TRUNCATE TABLE serv_type_answers;
+
+
+SET FOREIGN_KEY_CHECKS = 1;
 -- permisos
 INSERT INTO serv_permisions (prm_name,prm_state)
 VALUES ('administrar roles',1);
