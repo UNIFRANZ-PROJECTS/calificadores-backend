@@ -10,7 +10,7 @@ const {
 const router = Router();
 
 
-router.get('/areacampus/:Id', validarJWT , getReportAreaCampusById);
+router.get('/areacampus', validarJWT , getReportAreaCampusById);
 
 router.get('/national/campus/:Id', validarJWT, getReportNationalByIdCampus);
 

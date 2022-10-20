@@ -24,74 +24,75 @@ const {
   HeadQuartersModel,
   TypeUsersModel,
   RolesModel,
+  TerminalsModel
 } = require("../models");
 
 function getUniqueListBy(arr, key) {
   return [...new Map(arr.map((item) => [item[key], item])).values()];
 }
 const adminAuth = async (req = Request, res = Response) => {
-  const { email, password } = req.body;
+  const { email, password,deviceId } = req.body;
   try {
-    if (email && password) {
-      let user = await AdministratorsModel.findOne({
-        where: { adm_email: email, adm_state: 1 },
-        include: [
-          {
-            model: TypeUsersModel,
-            required: true,
-          },
-          {
-            model: RolesModel,
-            required: true,
-          },
-        ],
+    if(deviceId){
+      let device = await TerminalsModel.findOne({
+        where: { trm_serie: deviceId}
       });
-      if (!user) {
-        return res.status(404).json({ msg: "Usuario no tiene acceso" });
+      if(!device){
+        return res.status(404).json({ msg: "Está terminal no se encuentrá registrada" });
       }
-      bcryptjs.compare(
-        password,
-        user.adm_password,
-        async function (err, result) {
-          if (result) {
-            let token = await gerateJWT(user.id);
-            let resp = await getAllAdminAreaCampus({ id_admin: user.id });
-            let areaCampus = resp.map((a) => a.serv_area_headquarter.id_campus);
-            areaCampus = [...new Set(areaCampus)];
-            let areaCampusName = resp.map(
-              (a) =>
-                a.serv_area_headquarter.serv_area.ars_name +
-                "-" +
-                a.serv_area_headquarter.serv_headquarter.hdq_name
-            );
-            // areaCampusName = await getUniqueListBy(areaCampusName);
-            let rol = await PermisionRolesModel.findAll({
-              where: { id_rol: user.id_rol, prmRls_state: 1 },
-            });
-
-            let campus = resp.map(
-              (a) => a.serv_area_headquarter.serv_headquarter
-            );
-            campus = await getUniqueListBy(campus, "id");
-            let permisions = rol.map((a) => a.id_permision);
-            if (email == "servest@unifranz.edu.bo") {
-              areaCampus = [1, 2, 3, 4];
-            }
-            return res.json({
-              msg: "ok user",
-              user: user,
-              token: token,
-              permisions,
-              area_campus: areaCampus,
-              area_campus_name: areaCampusName,
-              campus: campus,
-            });
-          } else {
-            return res.status(404).json({ msg: "Contraseña incorrecta" });
-          }
-        }
-      );
     }
+    let user = await AdministratorsModel.findOne({
+      where: { adm_email: email, adm_state: 1 },
+      include: [
+        {
+          model: TypeUsersModel,
+          required: true,
+        },
+        {
+          model: RolesModel,
+          required: true,
+        },
+      ],
+    });
+    if (!user) {
+      return res.status(404).json({ msg: "Usuario no tiene acceso" });
+    }
+    bcryptjs.compare(password, user.adm_password, async function (err, result) {
+      if (result) {
+        let token = await gerateJWT(user.id);
+        let resp = await getAllAdminAreaCampus({ id_admin: user.id });
+        let areaCampus = resp.map((a) => a.serv_area_headquarter.id_campus);
+        areaCampus = [...new Set(areaCampus)];
+        let areaCampusName = resp.map(
+          (a) =>
+            a.serv_area_headquarter.serv_area.ars_name +
+            "-" +
+            a.serv_area_headquarter.serv_headquarter.hdq_name
+        );
+        // areaCampusName = await getUniqueListBy(areaCampusName);
+        let rol = await PermisionRolesModel.findAll({
+          where: { id_rol: user.id_rol, prmRls_state: 1 },
+        });
+
+        let campus = resp.map((a) => a.serv_area_headquarter.serv_headquarter);
+        campus = await getUniqueListBy(campus, "id");
+        let permisions = rol.map((a) => a.id_permision);
+        if (email == "servest@unifranz.edu.bo") {
+          areaCampus = [1, 2, 3, 4];
+        }
+        return res.json({
+          msg: "ok user",
+          user: user,
+          token: token,
+          permisions,
+          area_campus: areaCampus,
+          area_campus_name: areaCampusName,
+          campus: campus,
+        });
+      } else {
+        return res.status(404).json({ msg: "Contraseña incorrecta" });
+      }
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
