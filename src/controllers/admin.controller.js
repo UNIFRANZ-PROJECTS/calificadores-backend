@@ -31,12 +31,13 @@ function getUniqueListBy(arr, key) {
   return [...new Map(arr.map((item) => [item[key], item])).values()];
 }
 const adminAuth = async (req = Request, res = Response) => {
-  const { email, password,deviceId } = req.body;
+  const { email, password, deviceId } = req.body;
   try {
     if(deviceId){
       let device = await TerminalsModel.findOne({
         where: { trm_serie: deviceId}
       });
+      console.log('device'+device)
       if(!device){
         return res.status(404).json({ msg: "Está terminal no se encuentrá registrada" });
       }
