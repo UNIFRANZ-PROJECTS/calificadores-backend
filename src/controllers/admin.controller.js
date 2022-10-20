@@ -33,6 +33,7 @@ function getUniqueListBy(arr, key) {
 const adminAuth = async (req = Request, res = Response) => {
   const { email, password, deviceId } = req.body;
   try {
+    console.log(req.body)
     if(deviceId){
       let device = await TerminalsModel.findOne({
         where: { trm_serie: deviceId}
