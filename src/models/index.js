@@ -23,6 +23,7 @@ const forgotPasswords = require("./recuperarContraseñaModel")
 
 SurveyTerminalsModel.belongsTo(SurveysModel, {foreignKey: 'id_survey'});
 SurveyTerminalsModel.belongsTo(TerminalsModel, {foreignKey: 'id_terminal'});
+
 //fk reports
 AnswersModel.belongsTo(QuestionsModel, {foreignKey: 'id_question'});
 AnswersModel.belongsTo(SurveysModel, {foreignKey: 'id_survey'});
