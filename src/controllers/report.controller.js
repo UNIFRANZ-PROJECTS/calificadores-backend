@@ -143,7 +143,7 @@ const getReportAreaCampusById = async (req = request, res = response) => {
         });
       }
       // res.json(resultado);
-      res.json(groupByF(resultado,"hdq_name"));
+      res.json(groupByF(resultado, "hdq_name"));
     });
   } catch (error) {
     console.log(error);
@@ -168,29 +168,40 @@ function groupBy(array, key) {
 }
 const getReportNationalByIdCampus = async (req = request, res = response) => {
   try {
-    let campus = req.params.Id.split(",");
+    const token = req.header("authorization");
+    const bearer = token.split(" ");
+    const bearerToken = bearer[1];
+    const { uid } = jwt.verify(bearerToken, process.env.SECRETORPRIVATEKEY);
     let reports = [];
     let x = [];
-    getAllAnswers({}, { id_campus: campus }).then(async (result) => {
-      for (let i = 0; i < result.length; i++) {
-        await reports.push({
-          id: result[i].id,
-          srv_name: result[i].serv_survey.srv_name,
-          qst_question: result[i].serv_question.qst_question,
-          answer: result[i].answer,
-          date_answer: result[i].date_answer,
-          area: result[i].serv_survey.serv_area_headquarter.serv_area.ars_name,
-          sede: result[i].serv_survey.serv_area_headquarter.serv_headquarter
-            .hdq_name,
-          tyAns_name: result[i].serv_type_answer.tyAns_name,
-          updatedAt: result[i].updatedAt,
-        });
+    await AdminAreaCampusModel.findAll({
+      where: { id_admin: uid },
+      attributes: {
+        exclude: ["id_admin", "state", "createdAt", "updatedAt"],
+      },
+      
+    }).then(async (result) => {
+      for await (const key of result) {
+        await getAllAnswers({ id_area_campus: key.id_area_campus }).then(
+          async (result2) => {
+            for await (const key2 of result2) {
+              reports.push({ 
+                id: key2.id,
+                srv_name: key2.serv_survey.srv_name,
+                qst_question: key2.serv_question.qst_question,
+                answer: key2.answer,
+                date_answer: key2.date_answer,
+                area: key2.serv_survey.serv_area_headquarter.serv_area.ars_name,
+                sede: key2.serv_survey.serv_area_headquarter.serv_headquarter
+                  .hdq_name,
+                tyAns_name: key2.serv_type_answer.tyAns_name,
+                updatedAt: key2.updatedAt,
+              });
+            }
+          }
+        );
       }
-      let rep = groupBy(reports, "sede");
-      for (let j = 0; j < rep.length; j++) {
-        await x.push(groupBy(rep[j], "area"));
-      }
-      res.json(x);
+      res.json(reports);
     });
   } catch (error) {
     console.log(error);

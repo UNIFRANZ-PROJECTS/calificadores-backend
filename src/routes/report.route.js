@@ -12,6 +12,6 @@ const router = Router();
 
 router.get('/areacampus', validarJWT , getReportAreaCampusById);
 
-router.get('/national/campus/:Id', validarJWT, getReportNationalByIdCampus);
+router.get('/national/campus', validarJWT, getReportNationalByIdCampus);
 
 module.exports = router;
